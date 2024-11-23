@@ -13,6 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class InvisibleDeityMixin {
     @Inject(at = @At("HEAD"), method = "playerAttack", cancellable = true)
     public void playerAttack(PlayerEntity attacker, CallbackInfoReturnable<DamageSource> ci) {
-        if (attacker.isInvisible()) ci.setReturnValue(attacker.getWorld().getDamageSources().create(InvisibleDeity.INSTANCE.getPLAYER_ATTACK_INVISIBLE_DAMAGE_TYPE()));
+        if (!attacker.getWorld().getDamageSources().registry.contains(InvisibleDeity.INSTANCE.getPLAYER_ATTACK_INVISIBLE_DAMAGE_TYPE()))
+            InvisibleDeity.INSTANCE.getLogger().warn("Damage type {} does not exist in your world. Falling back to default {}", InvisibleDeity.INSTANCE.getConfig(), InvisibleDeity.INSTANCE.getDEFAULT_DAMAGE_TYPE());
+        if (attacker.isInvisible())
+            ci.setReturnValue(attacker.getWorld().getDamageSources().create(attacker.getWorld().getDamageSources().registry.contains(InvisibleDeity.INSTANCE.getPLAYER_ATTACK_INVISIBLE_DAMAGE_TYPE()) ? InvisibleDeity.INSTANCE.getPLAYER_ATTACK_INVISIBLE_DAMAGE_TYPE() : InvisibleDeity.INSTANCE.getDEFAULT_DAMAGE_TYPE_KEY()));
     }
 }
